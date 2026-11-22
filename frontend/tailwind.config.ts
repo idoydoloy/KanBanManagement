@@ -9,6 +9,9 @@ export default {
   ],
   theme: {
     extend: {
+      screens: {
+        nav: "850px",
+      },
       fontFamily: {
         sans: ["'Google Sans'", "var(--font-sans)", "system-ui", "-apple-system", "sans-serif"],
         heading: ["var(--font-heading)", "'Oswald'", "sans-serif"],

@@ -7,6 +7,7 @@ import {
   AlertCircle,
   ArrowLeft,
   LogOut,
+  Menu,
   Plus,
   Search,
   ShieldAlert,
@@ -21,6 +22,7 @@ import { Badge } from "@/components/ui/badge";
 import { AddMemberDialog } from "@/components/members/add-member-dialog";
 import { MemberTable } from "@/components/members/member-table";
 import { MemberFormValues } from "@/lib/validation/member-schema";
+import { MobileNavDrawer } from "@/components/layout/mobile-nav-drawer";
 
 export default function MembersPage() {
   const router = useRouter();
@@ -32,6 +34,7 @@ export default function MembersPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUpdatingId, setIsUpdatingId] = useState<string | null>(null);
   const [isAddOpen, setIsAddOpen] = useState(false);
+  const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const fetchMembers = useCallback(async () => {
@@ -176,8 +179,9 @@ export default function MembersPage() {
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
-            <div className="hidden sm:block text-right">
+          {/* Right Desktop Actions (>= 850px) */}
+          <div className="hidden nav:flex items-center gap-3">
+            <div className="text-right">
               <p className="text-sm font-semibold text-palette-brown">{user.name}</p>
               <p className="text-xs text-muted-foreground capitalize">Admin Divisi</p>
             </div>
@@ -190,6 +194,21 @@ export default function MembersPage() {
             >
               <LogOut className="h-3.5 w-3.5" />
               Keluar
+            </Button>
+          </div>
+
+          {/* Right Mobile Hamburger Button (< 850px) */}
+          <div className="flex nav:hidden items-center gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setIsMobileDrawerOpen(true)}
+              className="h-9 px-3 gap-1.5 text-xs font-heading uppercase tracking-wider border-border bg-card shadow-sm hover:bg-palette-cream/40"
+              aria-label="Buka menu navigasi"
+            >
+              <Menu className="h-4 w-4 text-palette-brown" />
+              <span className="text-palette-brown font-bold">Menu</span>
             </Button>
           </div>
         </div>
@@ -261,6 +280,14 @@ export default function MembersPage() {
         onAdd={handleAddMember}
         isSubmitting={isSubmitting}
         divisionName={user.division_name || user.division_id}
+      />
+
+      {/* Mobile Slide-over Drawer (< 850px) */}
+      <MobileNavDrawer
+        isOpen={isMobileDrawerOpen}
+        onClose={() => setIsMobileDrawerOpen(false)}
+        user={user}
+        onLogout={handleLogout}
       />
     </div>
   );

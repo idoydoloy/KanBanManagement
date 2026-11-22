@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { AlertCircle, Calendar, LogOut, Plus, Users } from "lucide-react";
+import { AlertCircle, Calendar, LogOut, Menu, Plus, Users } from "lucide-react";
 import { useAuthStore } from "@/store/auth-store";
 import { useKanbanStore } from "@/store/kanban-store";
 import { Button } from "@/components/ui/button";
@@ -14,12 +14,14 @@ import { KanbanColumn } from "@/components/kanban/kanban-column";
 import { CreateTaskDialog } from "@/components/task/create-task-dialog";
 import { TaskDetailDialog } from "@/components/task/task-detail-dialog";
 import { DeleteTaskDialog } from "@/components/task/delete-task-dialog";
+import { MobileNavDrawer } from "@/components/layout/mobile-nav-drawer";
 
 export default function DashboardPage() {
   const router = useRouter();
   const { user, isAuthenticated, isCheckingSession, logout } = useAuthStore();
   const { tasks, isLoading, error, fetchTasks, openCreate } = useKanbanStore();
   const [currentDate, setCurrentDate] = useState("");
+  const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
 
   useEffect(() => {
     setCurrentDate(
@@ -103,8 +105,8 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Center Context Date & Active Tasks Widget */}
-          <div className="hidden md:flex items-center gap-2.5 rounded-full border border-border bg-palette-cream/35 px-4 py-1 text-xs text-muted-foreground font-sans">
+          {/* Center Context Date & Active Tasks Widget (Visible on >= 850px) */}
+          <div className="hidden nav:flex items-center gap-2.5 rounded-full border border-border bg-palette-cream/35 px-4 py-1 text-xs text-muted-foreground font-sans">
             <div className="flex items-center gap-1.5 text-palette-brown">
               <Calendar className="h-3.5 w-3.5 text-palette-brown" />
               <time className="font-medium">{currentDate}</time>
@@ -119,14 +121,14 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Right User Profile Pill & Actions */}
-          <div className="flex items-center gap-2.5">
+          {/* Right User Profile Pill & Actions (Desktop >= 850px) */}
+          <div className="hidden nav:flex items-center gap-2.5">
             {user.role === "admin" && (
               <Button
                 asChild
                 variant="outline"
                 size="sm"
-                className="hidden sm:inline-flex gap-1.5 text-xs font-heading uppercase tracking-wider"
+                className="gap-1.5 text-xs font-heading uppercase tracking-wider"
               >
                 <Link href="/members">
                   <Users className="h-3.5 w-3.5" />
@@ -148,7 +150,7 @@ export default function DashboardPage() {
                 />
               </div>
 
-              <div className="text-left hidden sm:block">
+              <div className="text-left">
                 <p className="text-xs font-semibold leading-tight text-palette-brown">
                   {user.name}
                 </p>
@@ -168,7 +170,22 @@ export default function DashboardPage() {
               aria-label="Keluar dari akun"
             >
               <LogOut className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">Keluar</span>
+              <span>Keluar</span>
+            </Button>
+          </div>
+
+          {/* Right Mobile Hamburger Button (Active on < 850px) */}
+          <div className="flex nav:hidden items-center gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setIsMobileDrawerOpen(true)}
+              className="h-9 px-3 gap-1.5 text-xs font-heading uppercase tracking-wider border-border bg-card shadow-sm hover:bg-palette-cream/40"
+              aria-label="Buka menu navigasi"
+            >
+              <Menu className="h-4 w-4 text-palette-brown" />
+              <span className="text-palette-brown font-bold">Menu</span>
             </Button>
           </div>
         </div>
@@ -252,6 +269,17 @@ export default function DashboardPage() {
       <CreateTaskDialog />
       <TaskDetailDialog />
       <DeleteTaskDialog />
+
+      {/* Mobile Slide-over Drawer (< 850px) */}
+      <MobileNavDrawer
+        isOpen={isMobileDrawerOpen}
+        onClose={() => setIsMobileDrawerOpen(false)}
+        user={user}
+        currentDate={currentDate}
+        activeTasksCount={inProgressTasks.length}
+        onOpenCreateTask={openCreate}
+        onLogout={handleLogout}
+      />
     </div>
   );
 }
