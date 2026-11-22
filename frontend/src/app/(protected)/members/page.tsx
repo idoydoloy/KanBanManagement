@@ -23,6 +23,7 @@ import { AddMemberDialog } from "@/components/members/add-member-dialog";
 import { MemberTable } from "@/components/members/member-table";
 import { MemberFormValues } from "@/lib/validation/member-schema";
 import { MobileNavDrawer } from "@/components/layout/mobile-nav-drawer";
+import { AppFooter } from "@/components/layout/app-footer";
 
 export default function MembersPage() {
   const router = useRouter();
@@ -272,6 +273,9 @@ export default function MembersPage() {
           />
         )}
       </main>
+
+      {/* Micro-Footer Status Bar */}
+      <AppFooter divisionName={user.division_name || user.division_id} />
 
       {/* Add Member Dialog */}
       <AddMemberDialog

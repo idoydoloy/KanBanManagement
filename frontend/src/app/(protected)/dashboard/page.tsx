@@ -15,6 +15,7 @@ import { CreateTaskDialog } from "@/components/task/create-task-dialog";
 import { TaskDetailDialog } from "@/components/task/task-detail-dialog";
 import { DeleteTaskDialog } from "@/components/task/delete-task-dialog";
 import { MobileNavDrawer } from "@/components/layout/mobile-nav-drawer";
+import { AppFooter } from "@/components/layout/app-footer";
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -264,6 +265,9 @@ export default function DashboardPage() {
           </div>
         )}
       </main>
+
+      {/* Micro-Footer Status Bar */}
+      <AppFooter divisionName={user.division_name || user.division_id} />
 
       {/* CRUD Modals */}
       <CreateTaskDialog />
