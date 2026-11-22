@@ -3,7 +3,7 @@
 import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { AlertCircle, LogOut, Plus, Users } from "lucide-react";
+import { AlertCircle, LogOut, Palette, Plus, Users } from "lucide-react";
 import { useAuthStore } from "@/store/auth-store";
 import { useKanbanStore } from "@/store/kanban-store";
 import { Button } from "@/components/ui/button";
@@ -91,6 +91,13 @@ export default function DashboardPage() {
                 </Link>
               </Button>
             )}
+
+            <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex gap-1.5 text-xs text-muted-foreground hover:text-palette-brown">
+              <Link href="/theme">
+                <Palette className="h-3.5 w-3.5" />
+                Kunci Tema
+              </Link>
+            </Button>
 
             <Button
               variant="ghost"
