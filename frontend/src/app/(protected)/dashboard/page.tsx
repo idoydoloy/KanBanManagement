@@ -3,20 +3,31 @@
 import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { LogOut, Plus, Shield, Users, Kanban, Layers } from "lucide-react";
+import { AlertCircle, LogOut, Plus, Users } from "lucide-react";
 import { useAuthStore } from "@/store/auth-store";
+import { useKanbanStore } from "@/store/kanban-store";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { KanbanStats } from "@/components/kanban/kanban-stats";
+import { KanbanFilterBar } from "@/components/kanban/kanban-filter-bar";
+import { KanbanColumn } from "@/components/kanban/kanban-column";
 
 export default function DashboardPage() {
   const router = useRouter();
   const { user, isAuthenticated, isCheckingSession, logout } = useAuthStore();
+  const { tasks, isLoading, error, fetchTasks } = useKanbanStore();
 
   useEffect(() => {
     if (!isCheckingSession && !isAuthenticated) {
       router.push("/login");
     }
   }, [isCheckingSession, isAuthenticated, router]);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchTasks();
+    }
+  }, [isAuthenticated, fetchTasks]);
 
   const handleLogout = async () => {
     await logout();
@@ -25,8 +36,8 @@ export default function DashboardPage() {
 
   if (isCheckingSession) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background text-sm text-muted-foreground">
-        Memeriksa sesi pengguna...
+      <div className="flex min-h-screen items-center justify-center bg-background text-sm text-muted-foreground font-sans">
+        Memeriksa sesi login...
       </div>
     );
   }
@@ -35,27 +46,31 @@ export default function DashboardPage() {
     return null;
   }
 
+  const todoTasks = tasks.filter((t) => t.status === "todo");
+  const inProgressTasks = tasks.filter((t) => t.status === "in_progress");
+  const doneTasks = tasks.filter((t) => t.status === "done");
+
   return (
     <div className="min-h-screen bg-background">
-      {/* Top Navigation Bar */}
+      {/* Top Navigation */}
       <header className="border-b border-border bg-card px-4 py-3 sm:px-6">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-palette-olive text-palette-cream font-heading font-bold">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-palette-olive text-palette-cream font-heading font-bold text-sm">
               KM
             </div>
             <div>
-              <h1 className="font-heading text-lg font-bold uppercase tracking-wide text-palette-brown">
-                Kanban Portal
-              </h1>
-              <div className="flex items-center gap-2 text-xs">
-                <Badge
-                  variant={user.division_id === "div-marketing" ? "marketing" : "it"}
-                >
+              <div className="flex items-center gap-2">
+                <h1 className="font-heading text-lg font-bold uppercase tracking-wide text-palette-brown">
+                  Kanban Board
+                </h1>
+                <Badge variant={user.division_id === "div-marketing" ? "marketing" : "it"}>
                   {user.division_name || user.division_id}
                 </Badge>
-                <span className="text-muted-foreground capitalize">Role: {user.role}</span>
               </div>
+              <p className="text-xs text-muted-foreground capitalize">
+                {user.role} Divisi
+              </p>
             </div>
           </div>
 
@@ -69,7 +84,7 @@ export default function DashboardPage() {
               <Button asChild variant="outline" size="sm" className="hidden sm:inline-flex gap-1.5">
                 <Link href="/members">
                   <Users className="h-3.5 w-3.5" />
-                  Anggota
+                  Kelola Anggota
                 </Link>
               </Button>
             )}
@@ -87,38 +102,74 @@ export default function DashboardPage() {
         </div>
       </header>
 
-      {/* Main Dashboard Workspace */}
+      {/* Main Workspace */}
       <main className="mx-auto max-w-7xl p-4 sm:p-6 space-y-6">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-border pb-4">
+        {/* Workspace Title & Actions */}
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="text-2xl font-bold uppercase tracking-wider text-palette-brown">
-              Board Tugas Divisi {user.division_name || user.division_id}
+              Papan Kerja {user.division_name || user.division_id}
             </h2>
             <p className="text-sm text-muted-foreground">
-              Selamat datang, {user.name}. Berikut adalah ringkasan pekerjaan divisi Anda.
+              Memantau dan mengatur seluruh alur tugas tim {user.division_name || user.division_id}.
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
-            <Button className="gap-2 font-heading uppercase text-xs tracking-wider">
-              <Plus className="h-4 w-4" />
-              Tambah Task Baru
-            </Button>
-          </div>
+          <Button className="gap-2 font-heading uppercase text-xs tracking-wider shrink-0">
+            <Plus className="h-4 w-4" />
+            Tambah Tugas
+          </Button>
         </div>
 
-        {/* Phase Notification / Roadmap Callout */}
-        <div className="rounded-xl border border-palette-sage/40 bg-palette-sage/10 p-5 space-y-2">
-          <div className="flex items-center gap-2">
-            <Layers className="h-5 w-5 text-palette-olive" />
-            <h3 className="font-heading text-base font-bold uppercase text-palette-brown">
-              Fase FE-1 (Autentikasi & Session Selesai)
-            </h3>
+        {/* Metric Statistics */}
+        <KanbanStats tasks={tasks} />
+
+        {/* Filter & Search Bar */}
+        <KanbanFilterBar />
+
+        {/* Error Alert */}
+        {error && (
+          <div
+            role="alert"
+            className="flex items-center gap-2.5 rounded-lg border border-destructive/30 bg-destructive/10 p-4 text-xs text-destructive"
+          >
+            <AlertCircle className="h-4 w-4 shrink-0" />
+            <span>{error}</span>
           </div>
-          <p className="text-xs text-palette-brown/80">
-            Anda berhasil masuk sebagai <strong>{user.name}</strong> ({user.role} - {user.division_name}). Cookie sesi HttpOnly terhubung dan siap mendukung <strong>Fase FE-2 (Kanban Board Read)</strong> untuk menampilkan task live dari API.
-          </p>
-        </div>
+        )}
+
+        {/* 3 Columns Kanban Board */}
+        {isLoading && tasks.length === 0 ? (
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+            {[1, 2, 3].map((col) => (
+              <div
+                key={col}
+                className="h-[400px] rounded-xl border border-border bg-palette-cream/20 animate-pulse p-4"
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-3 items-start">
+            <KanbanColumn
+              status="todo"
+              title="To Do"
+              tasks={todoTasks}
+              count={todoTasks.length}
+            />
+            <KanbanColumn
+              status="in_progress"
+              title="In Progress"
+              tasks={inProgressTasks}
+              count={inProgressTasks.length}
+            />
+            <KanbanColumn
+              status="done"
+              title="Done"
+              tasks={doneTasks}
+              count={doneTasks.length}
+            />
+          </div>
+        )}
       </main>
     </div>
   );
