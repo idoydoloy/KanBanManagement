@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { AlertCircle, LogOut, Plus, Users } from "lucide-react";
+import { AlertCircle, Calendar, LogOut, Plus, Users } from "lucide-react";
 import { useAuthStore } from "@/store/auth-store";
 import { useKanbanStore } from "@/store/kanban-store";
 import { Button } from "@/components/ui/button";
@@ -19,6 +19,18 @@ export default function DashboardPage() {
   const router = useRouter();
   const { user, isAuthenticated, isCheckingSession, logout } = useAuthStore();
   const { tasks, isLoading, error, fetchTasks, openCreate } = useKanbanStore();
+  const [currentDate, setCurrentDate] = useState("");
+
+  useEffect(() => {
+    setCurrentDate(
+      new Date().toLocaleDateString("id-ID", {
+        weekday: "long",
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      })
+    );
+  }, []);
 
   useEffect(() => {
     if (!isCheckingSession && !isAuthenticated) {
@@ -49,6 +61,15 @@ export default function DashboardPage() {
     return null;
   }
 
+  const initials = user?.name
+    ? user.name
+        .split(" ")
+        .map((n) => n[0])
+        .join("")
+        .slice(0, 2)
+        .toUpperCase()
+    : "KM";
+
   const todoTasks = tasks.filter((t) => t.status === "todo");
   const inProgressTasks = tasks.filter((t) => t.status === "in_progress");
   const doneTasks = tasks.filter((t) => t.status === "done");
@@ -58,8 +79,9 @@ export default function DashboardPage() {
       {/* Top Navigation Bar */}
       <header className="border-b border-border bg-card px-4 py-3 sm:px-6">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
+          {/* Left Brand & Division Info */}
           <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-palette-olive text-palette-cream font-heading font-bold text-sm">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-palette-olive text-palette-cream font-heading font-bold text-sm shadow-sm">
               KM
             </div>
             <div>
@@ -67,24 +89,45 @@ export default function DashboardPage() {
                 <h1 className="font-heading text-lg font-bold uppercase tracking-wide text-palette-brown">
                   Kanban Board
                 </h1>
-                <Badge variant={user.division_id === "div-marketing" ? "marketing" : "it"}>
+                <Badge
+                  variant={
+                    user.division_id === "div-marketing" ? "marketing" : "it"
+                  }
+                >
                   {user.division_name || user.division_id}
                 </Badge>
               </div>
-              <p className="text-xs text-muted-foreground capitalize">
+              <p className="text-xs text-muted-foreground capitalize font-sans">
                 {user.role} Divisi
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
-            <div className="hidden sm:block text-right">
-              <p className="text-sm font-semibold text-palette-brown">{user.name}</p>
-              <p className="text-xs text-muted-foreground">{user.email}</p>
+          {/* Center Context Date & Active Tasks Widget */}
+          <div className="hidden md:flex items-center gap-2.5 rounded-full border border-border bg-palette-cream/35 px-4 py-1 text-xs text-muted-foreground font-sans">
+            <div className="flex items-center gap-1.5 text-palette-brown">
+              <Calendar className="h-3.5 w-3.5 text-palette-brown" />
+              <time className="font-medium">{currentDate}</time>
             </div>
+            <span className="text-border">•</span>
+            <div className="flex items-center gap-1.5">
+              <span className="h-1.5 w-1.5 rounded-full bg-palette-olive" />
+              <span className="font-heading font-bold uppercase tracking-wider text-palette-olive">
+                {inProgressTasks.length}
+              </span>
+              <span>Tugas Berjalan</span>
+            </div>
+          </div>
 
+          {/* Right User Profile Pill & Actions */}
+          <div className="flex items-center gap-2.5">
             {user.role === "admin" && (
-              <Button asChild variant="outline" size="sm" className="hidden sm:inline-flex gap-1.5">
+              <Button
+                asChild
+                variant="outline"
+                size="sm"
+                className="hidden sm:inline-flex gap-1.5 text-xs font-heading uppercase tracking-wider"
+              >
                 <Link href="/members">
                   <Users className="h-3.5 w-3.5" />
                   Kelola Anggota
@@ -92,14 +135,40 @@ export default function DashboardPage() {
               </Button>
             )}
 
+            {/* Avatar Pill */}
+            <div className="flex items-center gap-2.5 rounded-full border border-border bg-card py-1 pl-1.5 pr-3.5 shadow-sm">
+              <div className="relative">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-palette-olive text-palette-cream text-xs font-bold font-heading uppercase">
+                  {initials}
+                </div>
+                <span
+                  className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-card bg-emerald-600"
+                  title="Status: Aktif / Online"
+                  aria-label="Status: Aktif / Online"
+                />
+              </div>
+
+              <div className="text-left hidden sm:block">
+                <p className="text-xs font-semibold leading-tight text-palette-brown">
+                  {user.name}
+                </p>
+                <p className="text-[10px] text-muted-foreground capitalize leading-tight font-sans">
+                  {user.role} • {user.division_name || user.division_id}
+                </p>
+              </div>
+            </div>
+
+            {/* Cohesive Integrated Logout Button */}
             <Button
               variant="ghost"
               size="sm"
               onClick={handleLogout}
-              className="gap-1.5 text-xs text-muted-foreground hover:text-destructive"
+              className="h-8 gap-1.5 rounded-lg px-2.5 text-xs text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
+              title="Keluar dari akun"
+              aria-label="Keluar dari akun"
             >
               <LogOut className="h-3.5 w-3.5" />
-              Keluar
+              <span className="hidden sm:inline">Keluar</span>
             </Button>
           </div>
         </div>
@@ -114,7 +183,8 @@ export default function DashboardPage() {
               Papan Kerja {user.division_name || user.division_id}
             </h2>
             <p className="text-sm text-muted-foreground">
-              Kelola tugas, delegasikan pekerjaan, dan perbarui progres divisi secara langsung.
+              Kelola tugas, delegasikan pekerjaan, dan perbarui progres divisi
+              secara langsung.
             </p>
           </div>
 
