@@ -1,0 +1,140 @@
+{
+  "divisions": [
+    {
+      "id": "div-marketing",
+      "name": "Marketing",
+      "code": "MKT"
+    },
+    {
+      "id": "div-it",
+      "name": "Information Technology",
+      "code": "IT"
+    }
+  ],
+  "users": [
+    {
+      "id": "usr-mkt-admin",
+      "name": "Sarah Jenkins",
+      "email": "admin.marketing@kanban.com",
+      "password": "password123",
+      "role": "admin",
+      "division_id": "div-marketing",
+      "division_name": "Marketing",
+      "avatar": "SJ",
+      "status": "active"
+    },
+    {
+      "id": "usr-mkt-member",
+      "name": "Rian Pratama",
+      "email": "member.marketing@kanban.com",
+      "password": "password123",
+      "role": "member",
+      "division_id": "div-marketing",
+      "division_name": "Marketing",
+      "avatar": "RP",
+      "status": "active"
+    },
+    {
+      "id": "usr-it-admin",
+      "name": "Alex Wibowo",
+      "email": "admin.it@kanban.com",
+      "password": "password123",
+      "role": "admin",
+      "division_id": "div-it",
+      "division_name": "Information Technology",
+      "avatar": "AW",
+      "status": "active"
+    },
+    {
+      "id": "usr-it-member",
+      "name": "Dimas Setiawan",
+      "email": "member.it@kanban.com",
+      "password": "password123",
+      "role": "member",
+      "division_id": "div-it",
+      "division_name": "Information Technology",
+      "avatar": "DS",
+      "status": "active"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "tsk-mkt-1",
+      "title": "Penyusunan Konten Campaign Q1",
+      "description": "Menyusun artikel blog, materi email newsletter, dan copy media sosial untuk peluncuran produk.",
+      "status": "todo",
+      "priority": "high",
+      "division_id": "div-marketing",
+      "assigned_to": "usr-mkt-member",
+      "assignee_name": "Rian Pratama",
+      "due_date": "2026-12-05",
+      "created_by": "usr-mkt-admin",
+      "created_at": "2026-11-20T08:00:00Z"
+    },
+    {
+      "id": "tsk-mkt-2",
+      "title": "Riset Analisis Kompetitor Digital",
+      "description": "Memetakan positioning harga dan kanal distribusi pesaing utama di pasar lokal.",
+      "status": "in_progress",
+      "priority": "medium",
+      "division_id": "div-marketing",
+      "assigned_to": "usr-mkt-admin",
+      "assignee_name": "Sarah Jenkins",
+      "due_date": "2026-12-10",
+      "created_by": "usr-mkt-admin",
+      "created_at": "2026-11-21T09:30:00Z"
+    },
+    {
+      "id": "tsk-mkt-3",
+      "title": "Evaluasi Performa Iklan Q4",
+      "description": "Menghitung ROAS dan konversi dari kampanye berbayar Meta Ads dan Google Ads.",
+      "status": "done",
+      "priority": "low",
+      "division_id": "div-marketing",
+      "assigned_to": "usr-mkt-member",
+      "assignee_name": "Rian Pratama",
+      "due_date": "2026-11-15",
+      "created_by": "usr-mkt-admin",
+      "created_at": "2026-11-10T10:00:00Z"
+    },
+    {
+      "id": "tsk-it-1",
+      "title": "Setup Middleware Auth Cookie Hono",
+      "description": "Implementasikan session parsing HttpOnly cookie dengan penanganan token expired.",
+      "status": "todo",
+      "priority": "high",
+      "division_id": "div-it",
+      "assigned_to": "usr-it-member",
+      "assignee_name": "Dimas Setiawan",
+      "due_date": "2026-11-28",
+      "created_by": "usr-it-admin",
+      "created_at": "2026-11-20T11:00:00Z"
+    },
+    {
+      "id": "tsk-it-2",
+      "title": "Migrasi Skema Database Task & Divisi",
+      "description": "Menjalankan migrasi relational table untuk divisi, users, dan tasks beserta indeks status.",
+      "status": "in_progress",
+      "priority": "high",
+      "division_id": "div-it",
+      "assigned_to": "usr-it-admin",
+      "assignee_name": "Alex Wibowo",
+      "due_date": "2026-12-02",
+      "created_by": "usr-it-admin",
+      "created_at": "2026-11-21T14:00:00Z"
+    },
+    {
+      "id": "tsk-it-3",
+      "title": "Audit Dependensi & Keamanan Paket",
+      "description": "Memperbaiki kerentanan paket npm dan audit versi Node.js pada pipeline CI/CD.",
+      "status": "done",
+      "priority": "medium",
+      "division_id": "div-it",
+      "assigned_to": "usr-it-member",
+      "assignee_name": "Dimas Setiawan",
+      "due_date": "2026-11-18",
+      "created_by": "usr-it-admin",
+      "created_at": "2026-11-12T09:00:00Z"
+    }
+  ]
+}

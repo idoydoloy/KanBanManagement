@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Oswald, Plus_Jakarta_Sans } from "next/font/google";
+import { Providers } from "@/app/providers";
 import "./globals.css";
 
 const fontSans = Plus_Jakarta_Sans({
@@ -29,7 +30,7 @@ export default function RootLayout({
   return (
     <html lang="id" className={`${fontSans.variable} ${fontHeading.variable}`}>
       <body className="min-h-screen bg-background text-foreground antialiased selection:bg-palette-sage/30 selection:text-palette-brown">
-        {children}
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
