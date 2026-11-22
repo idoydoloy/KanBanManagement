@@ -1,5 +1,5 @@
 import React from "react";
-import { RotateCw, Search, X } from "lucide-react";
+import { RotateCw, Search, User, X } from "lucide-react";
 import { useKanbanStore } from "@/store/kanban-store";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -9,16 +9,21 @@ export function KanbanFilterBar() {
     search,
     statusFilter,
     priorityFilter,
+    onlyMyTasks,
     isLoading,
     setSearch,
     setStatusFilter,
     setPriorityFilter,
+    toggleOnlyMyTasks,
     resetFilters,
     fetchTasks,
   } = useKanbanStore();
 
   const hasActiveFilters =
-    search.trim() !== "" || statusFilter !== "all" || priorityFilter !== "all";
+    search.trim() !== "" ||
+    statusFilter !== "all" ||
+    priorityFilter !== "all" ||
+    onlyMyTasks;
 
   return (
     <div className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4 shadow-sm md:flex-row md:items-center md:justify-between">
@@ -45,6 +50,23 @@ export function KanbanFilterBar() {
 
       {/* Filter Selects & Actions */}
       <div className="flex flex-wrap items-center gap-2.5">
+        {/* Only My Tasks Toggle Button */}
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={toggleOnlyMyTasks}
+          className={`gap-1.5 text-xs font-heading uppercase tracking-wider transition-all shadow-sm ${
+            onlyMyTasks
+              ? "bg-palette-olive text-palette-cream border-palette-olive hover:bg-palette-olive/90 hover:text-palette-cream"
+              : "border-border bg-card text-palette-brown hover:bg-palette-cream/40"
+          }`}
+          aria-pressed={onlyMyTasks}
+        >
+          <User className="h-3.5 w-3.5" />
+          <span>Tugas Saya</span>
+        </Button>
+
         {/* Status Filter */}
         <select
           value={statusFilter}

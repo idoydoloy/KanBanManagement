@@ -1,5 +1,5 @@
-import React from "react";
-import { ArrowLeft, ArrowRight, Calendar, Check, Edit3 } from "lucide-react";
+import React, { useState } from "react";
+import { ArrowLeft, ArrowRight, Calendar, Check, Edit3, GripVertical } from "lucide-react";
 import { Task } from "@/types/task";
 import { Badge } from "@/components/ui/badge";
 import { useKanbanStore } from "@/store/kanban-store";
@@ -10,6 +10,7 @@ interface TaskCardProps {
 
 export function TaskCard({ task }: TaskCardProps) {
   const { openDetail, moveTaskStatus } = useKanbanStore();
+  const [isDragging, setIsDragging] = useState(false);
 
   const getPriorityVariant = (priority: Task["priority"]) => {
     switch (priority) {
@@ -32,12 +33,34 @@ export function TaskCard({ task }: TaskCardProps) {
     : null;
 
   return (
-    <article className="group relative rounded-xl border border-border bg-card p-4 shadow-sm transition-all hover:border-palette-sage/60 hover:shadow-md">
-      {/* Priority & Due Date Header */}
+    <article
+      draggable={true}
+      onDragStart={(e) => {
+        e.dataTransfer.setData("text/plain", task.id);
+        e.dataTransfer.effectAllowed = "move";
+        setIsDragging(true);
+      }}
+      onDragEnd={() => setIsDragging(false)}
+      className={`group relative rounded-xl border bg-card p-4 shadow-sm transition-all select-none ${
+        isDragging
+          ? "opacity-40 border-palette-olive border-dashed scale-[0.98]"
+          : "border-border hover:border-palette-sage/60 hover:shadow-md cursor-grab active:cursor-grabbing"
+      }`}
+    >
+      {/* Priority, Grip Indicator & Due Date Header */}
       <div className="flex items-start justify-between gap-2 pb-2">
-        <Badge variant={getPriorityVariant(task.priority)}>
-          {task.priority}
-        </Badge>
+        <div className="flex items-center gap-1.5">
+          <span
+            className="text-muted-foreground/50 group-hover:text-palette-brown transition-colors"
+            title="Tarik untuk memindahkan tugas"
+            aria-label="Tarik untuk memindahkan tugas"
+          >
+            <GripVertical className="h-3.5 w-3.5" />
+          </span>
+          <Badge variant={getPriorityVariant(task.priority)}>
+            {task.priority}
+          </Badge>
+        </div>
         {formattedDate && (
           <div className="flex items-center gap-1 text-[11px] text-muted-foreground">
             <Calendar className="h-3 w-3" />
@@ -84,7 +107,11 @@ export function TaskCard({ task }: TaskCardProps) {
 
           <button
             type="button"
-            onClick={() => openDetail(task)}
+            draggable={false}
+            onClick={(e) => {
+              e.stopPropagation();
+              openDetail(task);
+            }}
             className="flex items-center gap-1 text-[11px] text-palette-olive hover:underline"
             title="Edit Detail"
             aria-label="Edit Detail Tugas"
@@ -99,7 +126,11 @@ export function TaskCard({ task }: TaskCardProps) {
           {task.status === "todo" && (
             <button
               type="button"
-              onClick={() => moveTaskStatus(task.id, "in_progress")}
+              draggable={false}
+              onClick={(e) => {
+                e.stopPropagation();
+                moveTaskStatus(task.id, "in_progress");
+              }}
               className="ml-auto inline-flex items-center gap-1 rounded bg-palette-olive/10 px-2 py-1 font-semibold text-palette-olive hover:bg-palette-olive/20 transition-colors"
             >
               <span>Mulai</span>
@@ -111,7 +142,11 @@ export function TaskCard({ task }: TaskCardProps) {
             <>
               <button
                 type="button"
-                onClick={() => moveTaskStatus(task.id, "todo")}
+                draggable={false}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  moveTaskStatus(task.id, "todo");
+                }}
                 className="inline-flex items-center gap-1 rounded bg-muted px-2 py-1 text-muted-foreground hover:bg-muted/80 transition-colors"
               >
                 <ArrowLeft className="h-3 w-3" />
@@ -119,7 +154,11 @@ export function TaskCard({ task }: TaskCardProps) {
               </button>
               <button
                 type="button"
-                onClick={() => moveTaskStatus(task.id, "done")}
+                draggable={false}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  moveTaskStatus(task.id, "done");
+                }}
                 className="inline-flex items-center gap-1 rounded bg-palette-sage/20 px-2 py-1 font-semibold text-palette-brown hover:bg-palette-sage/30 transition-colors"
               >
                 <span>Selesai</span>
@@ -131,7 +170,11 @@ export function TaskCard({ task }: TaskCardProps) {
           {task.status === "done" && (
             <button
               type="button"
-              onClick={() => moveTaskStatus(task.id, "in_progress")}
+              draggable={false}
+              onClick={(e) => {
+                e.stopPropagation();
+                moveTaskStatus(task.id, "in_progress");
+              }}
               className="inline-flex items-center gap-1 rounded bg-muted px-2 py-1 text-muted-foreground hover:bg-muted/80 transition-colors"
             >
               <ArrowLeft className="h-3 w-3" />

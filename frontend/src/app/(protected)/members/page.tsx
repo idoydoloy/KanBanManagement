@@ -24,6 +24,7 @@ import { MemberTable } from "@/components/members/member-table";
 import { MemberFormValues } from "@/lib/validation/member-schema";
 import { MobileNavDrawer } from "@/components/layout/mobile-nav-drawer";
 import { AppFooter } from "@/components/layout/app-footer";
+import { toast } from "@/store/toast-store";
 
 export default function MembersPage() {
   const router = useRouter();
@@ -78,10 +79,13 @@ export default function MembersPage() {
       });
       await fetchMembers();
       setIsSubmitting(false);
+      toast.success(`Anggota "${values.name}" berhasil ditambahkan`);
       return true;
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Gagal menambahkan anggota");
+      const msg = err instanceof Error ? err.message : "Gagal menambahkan anggota";
+      setError(msg);
       setIsSubmitting(false);
+      toast.error(msg);
       return false;
     }
   };
@@ -94,8 +98,15 @@ export default function MembersPage() {
       setMembers((prev) =>
         prev.map((m) => (m.id === member.id ? { ...m, status: nextStatus } : m))
       );
+      toast.success(
+        `Status ${member.name} diubah menjadi ${
+          nextStatus === "active" ? "Aktif" : "Nonaktif"
+        }`
+      );
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Gagal mengubah status");
+      const msg = err instanceof Error ? err.message : "Gagal mengubah status";
+      setError(msg);
+      toast.error(msg);
     } finally {
       setIsUpdatingId(null);
     }
@@ -109,8 +120,15 @@ export default function MembersPage() {
       setMembers((prev) =>
         prev.map((m) => (m.id === member.id ? { ...m, role: nextRole } : m))
       );
+      toast.success(
+        `Role ${member.name} diubah menjadi ${
+          nextRole === "admin" ? "Admin" : "Member"
+        }`
+      );
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Gagal mengubah role");
+      const msg = err instanceof Error ? err.message : "Gagal mengubah role";
+      setError(msg);
+      toast.error(msg);
     } finally {
       setIsUpdatingId(null);
     }

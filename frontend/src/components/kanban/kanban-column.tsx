@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import { CheckCircle2, Clock, ListTodo } from "lucide-react";
 import { Task, TaskStatus } from "@/types/task";
 import { TaskCard } from "./task-card";
+import { useKanbanStore } from "@/store/kanban-store";
 
 interface KanbanColumnProps {
   status: TaskStatus;
@@ -11,6 +12,9 @@ interface KanbanColumnProps {
 }
 
 export function KanbanColumn({ status, title, tasks, count }: KanbanColumnProps) {
+  const { moveTaskStatus } = useKanbanStore();
+  const [isDragOver, setIsDragOver] = useState(false);
+
   const getHeaderIcon = () => {
     switch (status) {
       case "todo":
@@ -34,7 +38,31 @@ export function KanbanColumn({ status, title, tasks, count }: KanbanColumnProps)
   };
 
   return (
-    <section className="flex flex-col rounded-xl border border-border bg-palette-cream/25 p-3 sm:p-4">
+    <section
+      onDragOver={(e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = "move";
+        if (!isDragOver) setIsDragOver(true);
+      }}
+      onDragLeave={(e) => {
+        if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+          setIsDragOver(false);
+        }
+      }}
+      onDrop={(e) => {
+        e.preventDefault();
+        setIsDragOver(false);
+        const taskId = e.dataTransfer.getData("text/plain");
+        if (taskId) {
+          moveTaskStatus(taskId, status);
+        }
+      }}
+      className={`flex flex-col rounded-xl border p-3 sm:p-4 transition-all duration-200 ${
+        isDragOver
+          ? "border-palette-olive ring-2 ring-palette-olive/40 bg-palette-sage/15"
+          : "border-border bg-palette-cream/25"
+      }`}
+    >
       {/* Column Header */}
       <div
         className={`flex items-center justify-between border-b pb-3 mb-3 ${getBorderAccent()}`}
@@ -52,6 +80,13 @@ export function KanbanColumn({ status, title, tasks, count }: KanbanColumnProps)
 
       {/* Task List */}
       <div className="flex flex-col gap-3 min-h-[350px]">
+        {/* Drop Zone Banner when hovering */}
+        {isDragOver && (
+          <div className="rounded-lg border-2 border-dashed border-palette-olive bg-palette-olive/10 p-3 text-center text-xs font-semibold text-palette-olive transition-all animate-pulse">
+            Lepas kartu di sini untuk memindahkan ke {title}
+          </div>
+        )}
+
         {tasks.length === 0 ? (
           <div className="flex flex-1 flex-col items-center justify-center rounded-lg border border-dashed border-border/80 p-6 text-center">
             <p className="text-xs font-medium text-muted-foreground">

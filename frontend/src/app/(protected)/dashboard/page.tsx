@@ -20,7 +20,7 @@ import { AppFooter } from "@/components/layout/app-footer";
 export default function DashboardPage() {
   const router = useRouter();
   const { user, isAuthenticated, isCheckingSession, logout } = useAuthStore();
-  const { tasks, isLoading, error, fetchTasks, openCreate } = useKanbanStore();
+  const { tasks, isLoading, error, fetchTasks, openCreate, onlyMyTasks } = useKanbanStore();
   const [currentDate, setCurrentDate] = useState("");
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
 
@@ -73,9 +73,19 @@ export default function DashboardPage() {
         .toUpperCase()
     : "KM";
 
-  const todoTasks = tasks.filter((t) => t.status === "todo");
-  const inProgressTasks = tasks.filter((t) => t.status === "in_progress");
-  const doneTasks = tasks.filter((t) => t.status === "done");
+  const displayTasks =
+    onlyMyTasks && user
+      ? tasks.filter(
+          (t) =>
+            t.assigned_to === user.id ||
+            (t.assignee_name &&
+              t.assignee_name.toLowerCase() === user.name.toLowerCase())
+        )
+      : tasks;
+
+  const todoTasks = displayTasks.filter((t) => t.status === "todo");
+  const inProgressTasks = displayTasks.filter((t) => t.status === "in_progress");
+  const doneTasks = displayTasks.filter((t) => t.status === "done");
 
   return (
     <div className="min-h-screen bg-background">
@@ -216,7 +226,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Metric Statistics */}
-        <KanbanStats tasks={tasks} />
+        <KanbanStats tasks={displayTasks} />
 
         {/* Filter & Search Bar */}
         <KanbanFilterBar />
