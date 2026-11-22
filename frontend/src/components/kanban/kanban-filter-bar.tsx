@@ -92,6 +92,7 @@ export function KanbanFilterBar() {
           onClick={() => fetchTasks()}
           disabled={isLoading}
           title="Muat Ulang Data"
+          aria-label="Muat Ulang Data"
           className="shrink-0"
         >
           <RotateCw className={`h-4 w-4 ${isLoading ? "animate-spin text-palette-olive" : ""}`} />

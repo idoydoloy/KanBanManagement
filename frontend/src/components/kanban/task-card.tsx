@@ -87,6 +87,7 @@ export function TaskCard({ task }: TaskCardProps) {
             onClick={() => openDetail(task)}
             className="flex items-center gap-1 text-[11px] text-palette-olive hover:underline"
             title="Edit Detail"
+            aria-label="Edit Detail Tugas"
           >
             <Edit3 className="h-3 w-3" />
             <span>Detail</span>
