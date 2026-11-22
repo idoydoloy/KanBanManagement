@@ -11,11 +11,14 @@ import { Badge } from "@/components/ui/badge";
 import { KanbanStats } from "@/components/kanban/kanban-stats";
 import { KanbanFilterBar } from "@/components/kanban/kanban-filter-bar";
 import { KanbanColumn } from "@/components/kanban/kanban-column";
+import { CreateTaskDialog } from "@/components/task/create-task-dialog";
+import { TaskDetailDialog } from "@/components/task/task-detail-dialog";
+import { DeleteTaskDialog } from "@/components/task/delete-task-dialog";
 
 export default function DashboardPage() {
   const router = useRouter();
   const { user, isAuthenticated, isCheckingSession, logout } = useAuthStore();
-  const { tasks, isLoading, error, fetchTasks } = useKanbanStore();
+  const { tasks, isLoading, error, fetchTasks, openCreate } = useKanbanStore();
 
   useEffect(() => {
     if (!isCheckingSession && !isAuthenticated) {
@@ -52,7 +55,7 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Top Navigation */}
+      {/* Top Navigation Bar */}
       <header className="border-b border-border bg-card px-4 py-3 sm:px-6">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
           <div className="flex items-center gap-3">
@@ -111,11 +114,14 @@ export default function DashboardPage() {
               Papan Kerja {user.division_name || user.division_id}
             </h2>
             <p className="text-sm text-muted-foreground">
-              Memantau dan mengatur seluruh alur tugas tim {user.division_name || user.division_id}.
+              Kelola tugas, delegasikan pekerjaan, dan perbarui progres divisi secara langsung.
             </p>
           </div>
 
-          <Button className="gap-2 font-heading uppercase text-xs tracking-wider shrink-0">
+          <Button
+            onClick={openCreate}
+            className="gap-2 font-heading uppercase text-xs tracking-wider shrink-0"
+          >
             <Plus className="h-4 w-4" />
             Tambah Tugas
           </Button>
@@ -171,6 +177,11 @@ export default function DashboardPage() {
           </div>
         )}
       </main>
+
+      {/* CRUD Modals */}
+      <CreateTaskDialog />
+      <TaskDetailDialog />
+      <DeleteTaskDialog />
     </div>
   );
 }
