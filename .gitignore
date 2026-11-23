@@ -29,3 +29,7 @@ Thumbs.db
 .idea/
 .vscode/*
 !.vscode/settings.json
+
+# Agents & AI skills
+.agents/
+frontend/.agents/
