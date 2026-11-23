@@ -77,9 +77,8 @@ export default function DashboardPage() {
     onlyMyTasks && user
       ? tasks.filter(
           (t) =>
-            t.assigned_to === user.id ||
-            (t.assignee_name &&
-              t.assignee_name.toLowerCase() === user.name.toLowerCase())
+            t.assignees?.some((a) => a.id === user.id) ||
+            t.createdBy === user.id
         )
       : tasks;
 
@@ -104,10 +103,10 @@ export default function DashboardPage() {
                 </h1>
                 <Badge
                   variant={
-                    user.division_id === "div-marketing" ? "marketing" : "it"
+                    user.divisionId === "div-marketing" ? "marketing" : "it"
                   }
                 >
-                  {user.division_name || user.division_id}
+                  {user.divisionName || user.divisionId}
                 </Badge>
               </div>
               <p className="text-xs text-muted-foreground capitalize font-sans">
@@ -166,7 +165,7 @@ export default function DashboardPage() {
                   {user.name}
                 </p>
                 <p className="text-[10px] text-muted-foreground capitalize leading-tight font-sans">
-                  {user.role} • {user.division_name || user.division_id}
+                  {user.role} • {user.divisionName || user.divisionId}
                 </p>
               </div>
             </div>
@@ -208,7 +207,7 @@ export default function DashboardPage() {
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="text-2xl font-bold uppercase tracking-wider text-palette-brown">
-              Papan Kerja {user.division_name || user.division_id}
+              Papan Kerja {user.divisionName || user.divisionId}
             </h2>
             <p className="text-sm text-muted-foreground">
               Kelola tugas, delegasikan pekerjaan, dan perbarui progres divisi
@@ -277,7 +276,7 @@ export default function DashboardPage() {
       </main>
 
       {/* Micro-Footer Status Bar */}
-      <AppFooter divisionName={user.division_name || user.division_id} />
+      <AppFooter divisionName={user.divisionName || user.divisionId || "IT"} />
 
       {/* CRUD Modals */}
       <CreateTaskDialog />

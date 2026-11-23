@@ -1,3 +1,4 @@
+import { ApiResponse } from "@/types/api";
 import { CreateTaskInput, Task, TaskFilters, UpdateTaskInput } from "@/types/task";
 
 export const taskApi = {
@@ -5,17 +6,24 @@ export const taskApi = {
     const query = new URLSearchParams();
     if (filters?.status) query.set("status", filters.status);
     if (filters?.priority) query.set("priority", filters.priority);
-    if (filters?.search) query.set("search", filters.search);
+    if (filters?.q) query.set("q", filters.q);
+    if (filters?.assigneeId) query.set("assigneeId", filters.assigneeId);
 
     const res = await fetch(`/api/tasks?${query.toString()}`);
-    if (!res.ok) throw new Error("Gagal mengambil data task");
-    return res.json();
+    const data: ApiResponse<{ tasks: Task[]; total: number }> = await res.json();
+    if (!res.ok || !data.success) {
+      throw new Error(data.message || "Gagal mengambil data task");
+    }
+    return data.data.tasks;
   },
 
   async getTaskById(id: string): Promise<Task> {
     const res = await fetch(`/api/tasks/${id}`);
-    if (!res.ok) throw new Error("Gagal memuat detail task");
-    return res.json();
+    const data: ApiResponse<{ task: Task }> = await res.json();
+    if (!res.ok || !data.success) {
+      throw new Error(data.message || "Gagal memuat detail task");
+    }
+    return data.data.task;
   },
 
   async createTask(input: CreateTaskInput): Promise<Task> {
@@ -24,8 +32,11 @@ export const taskApi = {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(input),
     });
-    if (!res.ok) throw new Error("Gagal membuat task");
-    return res.json();
+    const data: ApiResponse<{ task: Task }> = await res.json();
+    if (!res.ok || !data.success) {
+      throw new Error(data.message || "Gagal membuat task");
+    }
+    return data.data.task;
   },
 
   async updateTask(id: string, input: UpdateTaskInput): Promise<Task> {
@@ -34,14 +45,20 @@ export const taskApi = {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(input),
     });
-    if (!res.ok) throw new Error("Gagal memperbarui task");
-    return res.json();
+    const data: ApiResponse<{ task: Task }> = await res.json();
+    if (!res.ok || !data.success) {
+      throw new Error(data.message || "Gagal memperbarui task");
+    }
+    return data.data.task;
   },
 
   async deleteTask(id: string): Promise<void> {
     const res = await fetch(`/api/tasks/${id}`, {
       method: "DELETE",
     });
-    if (!res.ok) throw new Error("Gagal menghapus task");
+    const data: ApiResponse<null> = await res.json();
+    if (!res.ok || !data.success) {
+      throw new Error(data.message || "Gagal menghapus task");
+    }
   },
 };

@@ -98,17 +98,17 @@ export function MemberTable({
                 <td className="px-4 py-3.5">
                   <span
                     className={`inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium ${
-                      member.status === "active"
+                      member.isActive
                         ? "bg-palette-olive/15 text-palette-olive"
                         : "bg-muted text-muted-foreground"
                     }`}
                   >
                     <span
                       className={`h-1.5 w-1.5 rounded-full ${
-                        member.status === "active" ? "bg-palette-olive" : "bg-muted-foreground"
+                        member.isActive ? "bg-palette-olive" : "bg-muted-foreground"
                       }`}
                     />
-                    {member.status === "active" ? "Aktif" : "Nonaktif"}
+                    {member.isActive ? "Aktif" : "Nonaktif"}
                   </span>
                 </td>
 
@@ -151,12 +151,12 @@ export function MemberTable({
                         disabled={isBusy}
                         onClick={() => onToggleStatus(member)}
                         className={`text-xs h-8 ${
-                          member.status === "active"
+                          member.isActive
                             ? "text-destructive hover:bg-destructive/10 hover:text-destructive"
                             : "text-palette-olive hover:bg-palette-olive/10 hover:text-palette-olive"
                         }`}
                       >
-                        {member.status === "active" ? (
+                        {member.isActive ? (
                           <>
                             <UserX className="h-3.5 w-3.5 mr-1" />
                             <span>Nonaktifkan</span>

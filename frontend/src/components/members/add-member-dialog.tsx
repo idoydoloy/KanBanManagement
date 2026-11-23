@@ -34,6 +34,7 @@ export function AddMemberDialog({
     defaultValues: {
       name: "",
       email: "",
+      password: "password123",
       role: "member",
     },
   });
@@ -91,17 +92,19 @@ export function AddMemberDialog({
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="member-role" required>
-            Hak Akses (Role)
+          <Label htmlFor="member-password">
+            Password Awal
           </Label>
-          <select
-            id="member-role"
-            className="flex h-10 w-full rounded-lg border border-border bg-card px-3 text-sm text-foreground shadow-sm focus:outline-none focus:ring-2 focus:ring-palette-olive font-sans"
-            {...register("role")}
-          >
-            <option value="member">Member (Hanya Kelola Task)</option>
-            <option value="admin">Admin Divisi (Kelola Task & Anggota)</option>
-          </select>
+          <Input
+            id="member-password"
+            type="password"
+            placeholder="Minimal 6 karakter (default: password123)"
+            error={Boolean(errors.password)}
+            {...register("password")}
+          />
+          {errors.password && (
+            <p className="text-xs text-destructive">{errors.password.message}</p>
+          )}
         </div>
 
         <div className="flex items-center justify-end gap-3 pt-4 border-t border-border">

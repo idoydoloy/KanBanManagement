@@ -7,26 +7,48 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const user = await getCurrentUserFromCookie();
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!user) {
+    return NextResponse.json(
+      { success: false, message: "Unauthorized", errors: [] },
+      { status: 401 }
+    );
+  }
 
   if (user.role !== "admin") {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    return NextResponse.json(
+      { success: false, message: "Forbidden", errors: [] },
+      { status: 403 }
+    );
   }
 
   const { id } = await params;
   const memberIndex = mockDb.users.findIndex(
-    (u) => u.id === id && u.division_id === user.division_id
+    (u) => u.id === id && u.divisionId === user.divisionId
   );
 
   if (memberIndex === -1) {
-    return NextResponse.json({ error: "Anggota tidak ditemukan" }, { status: 404 });
+    return NextResponse.json(
+      { success: false, message: "Anggota tidak ditemukan.", errors: [] },
+      { status: 404 }
+    );
   }
 
-  const { status } = await request.json();
-  if (status !== "active" && status !== "inactive") {
-    return NextResponse.json({ error: "Status tidak valid" }, { status: 400 });
-  }
+  const body = await request.json();
+  const nextIsActive =
+    typeof body.isActive === "boolean"
+      ? body.isActive
+      : body.status === "active";
 
-  mockDb.users[memberIndex].status = status;
-  return NextResponse.json({ success: true, message: "Status anggota berhasil diperbarui" });
+  mockDb.users[memberIndex].isActive = nextIsActive;
+  const { password: _, ...safeMember } = mockDb.users[memberIndex];
+
+  return NextResponse.json({
+    success: true,
+    message: nextIsActive
+      ? "Member berhasil diaktifkan."
+      : "Member berhasil dinonaktifkan dan seluruh session dicabut.",
+    data: {
+      member: safeMember,
+    },
+  });
 }

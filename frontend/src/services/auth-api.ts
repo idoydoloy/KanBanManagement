@@ -1,3 +1,4 @@
+import { ApiResponse } from "@/types/api";
 import { LoginInput, User } from "@/types/auth";
 
 export const authApi = {
@@ -8,11 +9,11 @@ export const authApi = {
       body: JSON.stringify(input),
     });
 
-    const data = await res.json();
-    if (!res.ok) {
-      throw new Error(data.error || "Gagal masuk ke akun");
+    const data: ApiResponse<{ user: User }> = await res.json();
+    if (!res.ok || !data.success) {
+      throw new Error(data.message || "Gagal masuk ke akun");
     }
-    return data;
+    return { message: data.message, user: data.data.user };
   },
 
   async logout(): Promise<void> {
@@ -21,10 +22,10 @@ export const authApi = {
 
   async getMe(): Promise<{ user: User }> {
     const res = await fetch("/api/auth/me");
-    const data = await res.json();
-    if (!res.ok) {
-      throw new Error(data.error || "Sesi tidak valid");
+    const data: ApiResponse<{ user: User }> = await res.json();
+    if (!res.ok || !data.success) {
+      throw new Error(data.message || "Sesi tidak valid");
     }
-    return data;
+    return { user: data.data.user };
   },
 };

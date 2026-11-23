@@ -5,7 +5,18 @@ export interface Member {
   name: string;
   email: string;
   role: Role;
-  status: "active" | "inactive";
-  division_id: string;
-  created_at?: string;
+  divisionId: string;
+  isActive: boolean;
+  createdAt?: string;
+}
+
+export interface CreateMemberInput {
+  name: string;
+  email: string;
+  password?: string;
+}
+
+export interface UpdateMemberInput {
+  name?: string;
+  email?: string;
 }

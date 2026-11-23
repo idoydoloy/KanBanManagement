@@ -75,7 +75,7 @@ export default function MembersPage() {
       await memberApi.addMember({
         name: values.name,
         email: values.email,
-        role: values.role,
+        password: values.password || "password123",
       });
       await fetchMembers();
       setIsSubmitting(false);
@@ -91,16 +91,16 @@ export default function MembersPage() {
   };
 
   const handleToggleStatus = async (member: Member) => {
-    const nextStatus = member.status === "active" ? "inactive" : "active";
+    const nextIsActive = !member.isActive;
     setIsUpdatingId(member.id);
     try {
-      await memberApi.updateMemberStatus(member.id, nextStatus);
+      await memberApi.updateMemberStatus(member.id, nextIsActive);
       setMembers((prev) =>
-        prev.map((m) => (m.id === member.id ? { ...m, status: nextStatus } : m))
+        prev.map((m) => (m.id === member.id ? { ...m, isActive: nextIsActive } : m))
       );
       toast.success(
         `Status ${member.name} diubah menjadi ${
-          nextStatus === "active" ? "Aktif" : "Nonaktif"
+          nextIsActive ? "Aktif" : "Nonaktif"
         }`
       );
     } catch (err) {
@@ -116,7 +116,7 @@ export default function MembersPage() {
     const nextRole = member.role === "admin" ? "member" : "admin";
     setIsUpdatingId(member.id);
     try {
-      await memberApi.updateMember(member.id, { role: nextRole });
+      await memberApi.updateMember(member.id, { role: nextRole } as Partial<Member>);
       setMembers((prev) =>
         prev.map((m) => (m.id === member.id ? { ...m, role: nextRole } : m))
       );
@@ -156,7 +156,7 @@ export default function MembersPage() {
             Akses Terbatas (403 Forbidden)
           </h2>
           <p className="text-xs text-muted-foreground font-sans leading-relaxed">
-            Halaman Manajemen Anggota hanya dapat diakses oleh <strong>Admin Divisi</strong>. Akun Anda saat ini terdaftar sebagai <strong>{user.role}</strong> di divisi {user.division_name || user.division_id}.
+            Halaman Manajemen Anggota hanya dapat diakses oleh <strong>Admin Divisi</strong>. Akun Anda saat ini terdaftar sebagai <strong>{user.role}</strong> di divisi {user.divisionName || user.divisionId}.
           </p>
           <Button asChild className="w-full font-heading uppercase tracking-wider">
             <Link href="/dashboard">
@@ -192,8 +192,8 @@ export default function MembersPage() {
               <h1 className="font-heading text-lg font-bold uppercase tracking-wide text-palette-brown">
                 Manajemen Anggota
               </h1>
-              <Badge variant={user.division_id === "div-marketing" ? "marketing" : "it"}>
-                {user.division_name || user.division_id}
+              <Badge variant={user.divisionId === "div-marketing" ? "marketing" : "it"}>
+                {user.divisionName || user.divisionId}
               </Badge>
             </div>
           </div>
@@ -239,7 +239,7 @@ export default function MembersPage() {
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="text-2xl font-bold uppercase tracking-wider text-palette-brown">
-              Daftar Anggota Divisi {user.division_name || user.division_id}
+              Daftar Anggota Divisi {user.divisionName || user.divisionId}
             </h2>
             <p className="text-sm text-muted-foreground font-sans">
               Kelola hak akses dan status keaktifan anggota di tim divisi Anda.
@@ -293,7 +293,7 @@ export default function MembersPage() {
       </main>
 
       {/* Micro-Footer Status Bar */}
-      <AppFooter divisionName={user.division_name || user.division_id} />
+      <AppFooter divisionName={user.divisionName || user.divisionId || "IT"} />
 
       {/* Add Member Dialog */}
       <AddMemberDialog
@@ -301,7 +301,7 @@ export default function MembersPage() {
         onClose={() => setIsAddOpen(false)}
         onAdd={handleAddMember}
         isSubmitting={isSubmitting}
-        divisionName={user.division_name || user.division_id}
+        divisionName={user.divisionName || user.divisionId || "IT"}
       />
 
       {/* Mobile Slide-over Drawer (< 850px) */}

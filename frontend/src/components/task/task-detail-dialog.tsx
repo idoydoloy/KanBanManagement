@@ -3,7 +3,7 @@
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Trash2 } from "lucide-react";
+import { Trash2, Users } from "lucide-react";
 import { taskSchema, type TaskFormValues } from "@/lib/validation/task-schema";
 import { TaskPriority, TaskStatus } from "@/types/task";
 import { useKanbanStore } from "@/store/kanban-store";
@@ -48,8 +48,8 @@ export function TaskDetailDialog() {
         description: selectedTask.description || "",
         priority: selectedTask.priority,
         status: selectedTask.status,
-        assigned_to: selectedTask.assignee_name || "",
-        due_date: selectedTask.due_date || "",
+        assigned_to: selectedTask.assignees?.[0]?.name || "",
+        due_date: selectedTask.dueDate || "",
       });
     }
   }, [selectedTask, reset]);
@@ -61,10 +61,10 @@ export function TaskDetailDialog() {
   const onSubmit = async (values: TaskFormValues & { status: TaskStatus }) => {
     const success = await updateTask(selectedTask.id, {
       title: values.title,
-      description: values.description,
+      description: values.description || null,
       priority: values.priority as TaskPriority,
       status: values.status,
-      due_date: values.due_date,
+      dueDate: values.due_date || null,
     });
 
     if (success) {
@@ -78,8 +78,8 @@ export function TaskDetailDialog() {
       onClose={closeDetail}
       title="Detail & Edit Tugas"
       description={`ID: #${selectedTask.id.slice(-6)} • Dibuat ${
-        selectedTask.created_at
-          ? new Date(selectedTask.created_at).toLocaleDateString("id-ID")
+        selectedTask.createdAt
+          ? new Date(selectedTask.createdAt).toLocaleDateString("id-ID")
           : "-"
       }`}
     >
@@ -156,6 +156,29 @@ export function TaskDetailDialog() {
             <Input id="edit-due" type="date" {...register("due_date")} />
           </div>
         </div>
+
+        {/* Assignees display */}
+        {selectedTask.assignees && selectedTask.assignees.length > 0 && (
+          <div className="rounded-lg border border-border bg-palette-cream/20 p-2.5 space-y-1.5">
+            <span className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-palette-brown font-heading">
+              <Users className="h-3.5 w-3.5 text-palette-olive" />
+              Anggota yang Ditugaskan
+            </span>
+            <div className="flex flex-wrap gap-1.5">
+              {selectedTask.assignees.map((assignee) => (
+                <span
+                  key={assignee.id}
+                  className="inline-flex items-center gap-1 rounded-full border border-border bg-card px-2.5 py-0.5 text-xs font-medium text-foreground shadow-xs"
+                >
+                  <span className="flex h-4 w-4 items-center justify-center rounded-full bg-palette-olive text-palette-cream text-[9px] font-bold">
+                    {assignee.name.charAt(0)}
+                  </span>
+                  <span>{assignee.name}</span>
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Action Controls */}
         <div className="flex items-center justify-between pt-4 border-t border-border">

@@ -67,13 +67,14 @@ export const useKanbanStore = create<KanbanState>((set, get) => ({
       const { search, statusFilter, priorityFilter } = get();
 
       const activeFilters: TaskFilters = {
-        search: customFilters?.search ?? (search ? search : undefined),
+        q: customFilters?.q ?? (search ? search : undefined),
         status:
           customFilters?.status ??
           (statusFilter !== "all" ? (statusFilter as TaskStatus) : undefined),
         priority:
           customFilters?.priority ??
           (priorityFilter !== "all" ? (priorityFilter as TaskPriority) : undefined),
+        assigneeId: customFilters?.assigneeId,
       };
 
       const tasks = await taskApi.getTasks(activeFilters);
@@ -191,7 +192,7 @@ export const useKanbanStore = create<KanbanState>((set, get) => ({
 
   resetFilters: () => {
     set({ search: "", statusFilter: "all", priorityFilter: "all", onlyMyTasks: false });
-    get().fetchTasks({ search: undefined, status: undefined, priority: undefined });
+    get().fetchTasks({ q: undefined, status: undefined, priority: undefined, assigneeId: undefined });
   },
 
   setSelectedTask: (task: Task | null) => set({ selectedTask: task }),

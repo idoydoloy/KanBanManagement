@@ -6,10 +6,16 @@ export async function GET() {
 
   if (!user) {
     return NextResponse.json(
-      { error: "Sesi tidak ditemukan atau telah kedaluwarsa." },
+      { success: false, message: "Sesi tidak ditemukan atau telah kedaluwarsa.", errors: [] },
       { status: 401 }
     );
   }
 
-  return NextResponse.json({ user });
+  return NextResponse.json({
+    success: true,
+    message: "Profil berhasil diambil.",
+    data: {
+      user,
+    },
+  });
 }

@@ -1,13 +1,14 @@
-export type Role = "admin" | "member";
+export type Role = "platform_admin" | "admin" | "member";
 
 export interface User {
   id: string;
   name: string;
   email: string;
   role: Role;
-  division_id: string;
-  division_name?: string;
-  created_at?: string;
+  divisionId: string | null;
+  divisionName?: string | null;
+  isActive: boolean;
+  createdAt?: string;
 }
 
 export interface LoginInput {

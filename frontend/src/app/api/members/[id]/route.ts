@@ -7,19 +7,30 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const user = await getCurrentUserFromCookie();
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!user) {
+    return NextResponse.json(
+      { success: false, message: "Unauthorized", errors: [] },
+      { status: 401 }
+    );
+  }
 
   if (user.role !== "admin") {
-    return NextResponse.json({ error: "Forbidden: Hanya Admin yang dapat mengubah anggota." }, { status: 403 });
+    return NextResponse.json(
+      { success: false, message: "Forbidden: Hanya Admin yang dapat mengubah anggota.", errors: [] },
+      { status: 403 }
+    );
   }
 
   const { id } = await params;
   const memberIndex = mockDb.users.findIndex(
-    (u) => u.id === id && u.division_id === user.division_id
+    (u) => u.id === id && u.divisionId === user.divisionId
   );
 
   if (memberIndex === -1) {
-    return NextResponse.json({ error: "Anggota tidak ditemukan" }, { status: 404 });
+    return NextResponse.json(
+      { success: false, message: "Anggota tidak ditemukan.", errors: [] },
+      { status: 404 }
+    );
   }
 
   const updates = await request.json();
@@ -27,11 +38,20 @@ export async function PATCH(
 
   const updatedMember = {
     ...existing,
-    ...updates,
-    division_id: existing.division_id, // Prevent altering division
+    name: updates.name ? updates.name.trim() : existing.name,
+    email: updates.email ? updates.email.trim().toLowerCase() : existing.email,
+    role: updates.role ? updates.role : existing.role,
+    divisionId: existing.divisionId,
   };
 
   mockDb.users[memberIndex] = updatedMember;
   const { password: _, ...safeMember } = updatedMember;
-  return NextResponse.json(safeMember);
+
+  return NextResponse.json({
+    success: true,
+    message: "Data Member berhasil diperbarui.",
+    data: {
+      member: safeMember,
+    },
+  });
 }

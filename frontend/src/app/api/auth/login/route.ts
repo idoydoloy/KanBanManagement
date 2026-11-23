@@ -8,7 +8,7 @@ export async function POST(request: Request) {
 
     if (!email || !password) {
       return NextResponse.json(
-        { error: "Email dan password wajib diisi." },
+        { success: false, message: "Email dan password wajib diisi.", errors: [] },
         { status: 400 }
       );
     }
@@ -19,8 +19,15 @@ export async function POST(request: Request) {
 
     if (!user || user.password !== password) {
       return NextResponse.json(
-        { error: "Email atau password salah." },
+        { success: false, message: "Email atau password salah.", errors: [] },
         { status: 401 }
+      );
+    }
+
+    if (!user.isActive) {
+      return NextResponse.json(
+        { success: false, message: "Akun ini telah dinonaktifkan.", errors: [] },
+        { status: 403 }
       );
     }
 
@@ -28,12 +35,15 @@ export async function POST(request: Request) {
 
     const { password: _, ...safeUser } = user;
     return NextResponse.json({
-      message: "Login berhasil",
-      user: safeUser,
+      success: true,
+      message: "Login berhasil.",
+      data: {
+        user: safeUser,
+      },
     });
   } catch {
     return NextResponse.json(
-      { error: "Terjadi kesalahan internal pada server." },
+      { success: false, message: "Terjadi kesalahan pada server.", errors: [] },
       { status: 500 }
     );
   }

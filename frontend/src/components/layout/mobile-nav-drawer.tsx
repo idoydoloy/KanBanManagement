@@ -119,9 +119,9 @@ export function MobileNavDrawer({
 
             <div className="flex items-center gap-2 pt-1 border-t border-border/60">
               <Badge
-                variant={user.division_id === "div-marketing" ? "marketing" : "it"}
+                variant={user.divisionId === "div-marketing" ? "marketing" : "it"}
               >
-                {user.division_name || user.division_id}
+                {user.divisionName || user.divisionId}
               </Badge>
               <span className="text-xs capitalize text-muted-foreground font-sans">
                 {user.role} Divisi

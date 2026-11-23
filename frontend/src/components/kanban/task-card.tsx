@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ArrowLeft, ArrowRight, Calendar, Check, Edit3, GripVertical } from "lucide-react";
+import { ArrowLeft, ArrowRight, Calendar, Check, Edit3, GripVertical, Users } from "lucide-react";
 import { Task } from "@/types/task";
 import { Badge } from "@/components/ui/badge";
 import { useKanbanStore } from "@/store/kanban-store";
@@ -25,12 +25,17 @@ export function TaskCard({ task }: TaskCardProps) {
     }
   };
 
-  const formattedDate = task.due_date
-    ? new Date(task.due_date).toLocaleDateString("id-ID", {
+  const formattedDate = task.dueDate
+    ? new Date(task.dueDate).toLocaleDateString("id-ID", {
         day: "numeric",
         month: "short",
       })
     : null;
+
+  const primaryAssignee = task.assignees?.[0];
+  const assigneeName = primaryAssignee ? primaryAssignee.name : "Unassigned";
+  const assigneeInitial = primaryAssignee ? primaryAssignee.name.charAt(0).toUpperCase() : "U";
+  const hasMultipleAssignees = (task.assignees?.length || 0) > 1;
 
   return (
     <article
@@ -98,11 +103,17 @@ export function TaskCard({ task }: TaskCardProps) {
         <div className="flex items-center justify-between text-xs text-muted-foreground">
           <div className="flex items-center gap-1.5">
             <div className="flex h-5 w-5 items-center justify-center rounded-full bg-palette-sage/20 text-[10px] font-bold text-palette-brown uppercase">
-              {task.assignee_name ? task.assignee_name.charAt(0) : "U"}
+              {assigneeInitial}
             </div>
-            <span className="truncate max-w-[120px] font-medium text-palette-brown">
-              {task.assignee_name || "Unassigned"}
+            <span className="truncate max-w-[120px] font-medium text-palette-brown" title={assigneeName}>
+              {assigneeName}
             </span>
+            {hasMultipleAssignees && (
+              <span className="inline-flex items-center gap-0.5 rounded-full bg-palette-cream px-1.5 py-0.2 text-[9px] font-semibold text-palette-brown">
+                <Users className="h-2.5 w-2.5" />
+                +{task.assignees.length - 1}
+              </span>
+            )}
           </div>
 
           <button

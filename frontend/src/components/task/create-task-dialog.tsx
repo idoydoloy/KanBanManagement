@@ -34,10 +34,11 @@ export function CreateTaskDialog() {
   const onSubmit = async (values: TaskFormValues) => {
     const success = await addTask({
       title: values.title,
-      description: values.description,
+      description: values.description || null,
       priority: values.priority,
-      assigned_to: user?.id,
-      due_date: values.due_date,
+      status: "todo",
+      dueDate: values.due_date || null,
+      assigneeIds: user ? [user.id] : [],
     });
 
     if (success) {
@@ -55,7 +56,7 @@ export function CreateTaskDialog() {
       isOpen={isCreateOpen}
       onClose={handleClose}
       title="Tambah Tugas Baru"
-      description={`Buat tugas baru untuk divisi ${user?.division_name || user?.division_id}.`}
+      description={`Buat tugas baru untuk divisi ${user?.divisionName || user?.divisionId}.`}
     >
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div className="space-y-1.5">
